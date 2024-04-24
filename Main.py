@@ -7,39 +7,40 @@ pygame.init()
 size = width, height = 1920, 1080
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Project SirGreyAlot")
-bgrndclr = (50,168,66)
+bgrndclr = (0,0,0)
 
 #set frame rate
 clock = pygame.time.Clock()
 FPS = 60
 
 #images
+scale = 5 #size images will be scaled by
 plrSprite = pygame.image.load('./assets/images/CharSpreadSheet.png').convert_alpha()
+bgImg = pygame.image.load('./assets/images/background.png').convert_alpha()
 
-def get_image(sheet, frame, x, y, scale):
+def get_image(sheet, frame, x, y):
     image = pygame.Surface((x, y), pygame.SRCALPHA).convert_alpha()
     image.blit(sheet, (0, 0), ((frame * x),0, x, y))
     image = pygame.transform.scale_by(image, (scale, scale))
 
     return image
 
-#create animation list
-animationlist = []
-animation_steps = 2
-lastUpdate = pygame.time.get_ticks()
-animationCooldown = 500
+#background
+def background(image, x, y):
+    image = pygame.transform.scale_by(image, (scale, scale))
+    image = screen.blit(image, (x ,y))
 
 #player class
 class Player():
     def __init__(self, x, y):
 
-        self.image = get_image(plrSprite, 0 , 30, 30, 5)
+        self.image = get_image(plrSprite, 0 , 30, 30)
         self.rect = self.image.get_rect()
+        self.rect.center = (width/2, height/2)
         self.posX = x
         self.posY = y
         self.speed = 10
         self.flip = False
-        self.status = 0
 
     def draw(self):
         screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
@@ -62,23 +63,20 @@ class Player():
         if keyPressed[pygame.K_s]:
             dy += player.speed
 
+
         if keyPressed[pygame.K_d]:
             dx += player.speed 
             self.flip = False
-            self.walk()
 
         #update rectangle position
         self.rect.x += dx
         self.rect.y += dy
 
     def idle(self):
-        self.image = get_image(plrSprite, 0 , 30, 30, 5)
+        self.image = get_image(plrSprite, 0 , 30, 30)
 
     def walk(self):
-        self.image = get_image(plrSprite, 1 , 30, 30, 5)
-
-        
-
+        self.image = get_image(plrSprite, 1 , 30, 30)
 
 
 player = Player(0, 0)
@@ -91,6 +89,7 @@ while run:
 
     #BACKGROUND
     screen.fill(bgrndclr)
+    background(bgImg, 0, 0)
 
     #DRAW SPRITES
     player.draw()
