@@ -3,11 +3,14 @@ from multiprocessing.connection import wait
 import pygame,time
 pygame.init()
 
+from scripts import * 
+from scripts.classes import *
+
 #sets window settings
 size = width, height = 1920, 1080
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Project SirGreyAlot")
-bgrndclr = (0,0,0)
+bgclr = (50,50,50)
 
 #set frame rate
 clock = pygame.time.Clock()
@@ -15,71 +18,14 @@ FPS = 60
 
 #images
 scale = 5 #size images will be scaled by
-plrSprite = pygame.image.load('./assets/images/CharSpreadSheet.png').convert_alpha()
-bgImg = pygame.image.load('./assets/images/background.png').convert_alpha()
 
-def get_image(sheet, frame, x, y):
-    image = pygame.Surface((x, y), pygame.SRCALPHA).convert_alpha()
-    image.blit(sheet, (0, 0), ((frame * x),0, x, y))
-    image = pygame.transform.scale_by(image, (scale, scale))
+plrSprite = pygame.image.load('./images/CharSpreadSheet.png').convert_alpha()
+treeSprite = pygame.image.load('./images/Tree.png').convert_alpha()
+bgImg = pygame.image.load('./images/background.png').convert_alpha()
 
-    return image
-
-#background
-def background(image, x, y):
-    image = pygame.transform.scale_by(image, (scale, scale))
-    image = screen.blit(image, (x ,y))
-
-#player class
-class Player():
-    def __init__(self, x, y):
-
-        self.image = get_image(plrSprite, 0 , 30, 30)
-        self.rect = self.image.get_rect()
-        self.rect.center = (width/2, height/2)
-        self.posX = x
-        self.posY = y
-        self.speed = 10
-        self.flip = False
-
-    def draw(self):
-        screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
-
-    def move(self):
-        #reset variables
-        dx = 0
-        dy = 0
-
-        #process keys
-        keyPressed = pygame.key.get_pressed()
-
-        if keyPressed[pygame.K_w]:
-            dy -= player.speed
-
-        if keyPressed[pygame.K_a]:
-            dx -= player.speed 
-            self.flip = True
-        
-        if keyPressed[pygame.K_s]:
-            dy += player.speed
-
-
-        if keyPressed[pygame.K_d]:
-            dx += player.speed 
-            self.flip = False
-
-        #update rectangle position
-        self.rect.x += dx
-        self.rect.y += dy
-
-    def idle(self):
-        self.image = get_image(plrSprite, 0 , 30, 30)
-
-    def walk(self):
-        self.image = get_image(plrSprite, 1 , 30, 30)
-
-
-player = Player(0, 0)
+#init
+player = Player(width/2,height/2, plrSprite, screen)
+tree1 = Tree(250,250, treeSprite, screen)
 
 #game loop
 run = True
@@ -88,14 +34,17 @@ while run:
     clock.tick(FPS)
 
     #BACKGROUND
-    screen.fill(bgrndclr)
-    background(bgImg, 0, 0)
+    screen.fill(bgclr)
 
     #DRAW SPRITES
     player.draw()
+    tree1.draw()
 
-    #MOVEMENT
-    player.move() 
+    if pygame.sprite.collide_rect(player, tree1):
+        print("Stop touching me!")
+
+    #CONTROLS
+    player.move()
 
     #for loop through the event queue
     for event in pygame.event.get():        
