@@ -38,7 +38,6 @@ class Player(pygame.sprite.Sprite):
 
     def draw(self):
         self.sheet.blit(pygame.transform.flip(self.image, self.flip, False), (self.rect.x-33, self.rect.y-12))
-        pygame.draw.rect(self.sheet, (255,255,255), self.rect)
 
     def move(self):
         #reset variables
