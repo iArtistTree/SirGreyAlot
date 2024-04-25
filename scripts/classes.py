@@ -46,18 +46,22 @@ class Player(pygame.sprite.Sprite):
 
         #process keys
         keyPressed = pygame.key.get_pressed()
-
+        
+        #up
         if keyPressed[pygame.K_w]:
             dy -= self.velY
 
+
+        #left
         if keyPressed[pygame.K_a]:
             dx -= self.velX 
             self.flip = True
         
+        #down
         if keyPressed[pygame.K_s]:
             dy += self.velY
 
-
+        #right
         if keyPressed[pygame.K_d]:
             dx += self.velX 
             self.flip = False
@@ -71,6 +75,7 @@ class Player(pygame.sprite.Sprite):
 #Tree
 class Tree(pygame.sprite.Sprite):
     def __init__(self, x, y, spriteSheet, sheet):
+        pygame.sprite.Sprite.__init__(self)
         self.image = SpriteSHeet.get_image(spriteSheet, 0, 60, 60)
         self.rect = self.image.get_rect()
         self.rect.center = (x,y)

@@ -23,9 +23,13 @@ plrSprite = pygame.image.load('./images/CharSpreadSheet.png').convert_alpha()
 treeSprite = pygame.image.load('./images/Tree.png').convert_alpha()
 bgImg = pygame.image.load('./images/background.png').convert_alpha()
 
-#init
+#sprites groups
+trees = pygame.sprite.Group()
+
+#sprites
 player = Player(width/2,height/2, plrSprite, screen)
 tree1 = Tree(250,250, treeSprite, screen)
+tree1.add(trees)
 
 #game loop
 run = True
@@ -40,8 +44,18 @@ while run:
     player.draw()
     tree1.draw()
 
-    if pygame.sprite.collide_rect(player, tree1):
-        print("Stop touching me!")
+    if pygame.sprite.spritecollide(player, trees, False):
+        #process keys
+        keyPressed = pygame.key.get_pressed()
+        
+        #up or down
+        if keyPressed[pygame.K_w] or keyPressed[pygame.K_s]:
+            print("STOP")
+        
+        #left or right
+        if keyPressed[pygame.K_a] or keyPressed[pygame.K_d]:
+            print("STOP 2")
+
 
     #CONTROLS
     player.move()
