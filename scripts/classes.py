@@ -34,6 +34,8 @@ class Player(pygame.sprite.Sprite):
         self.rect = pygame.Rect(0, 0, self.width, self.height)
         self.rect.center = pygame.math.Vector2(x,y)
 
+        self.oldRect = self.rect.copy()
+
         self.flip = False
         self.sheet = sheet
 
@@ -78,28 +80,29 @@ class Player(pygame.sprite.Sprite):
             if direction == 'horizontal':
                 for sprite in collisionSprites:
                     #collision on the right
-                    if self.rect.right >= sprite.rect.left:
+                    if self.rect.right >= sprite.rect.left and self.oldRect.right <= sprite.oldRect.left:
                         self.rect.right = sprite.rect.left
                         self.pos.x = self.rect.x
 
                     #collision on the left
-                    if self.rect.left <= sprite.rect.right:
+                    if self.rect.left <= sprite.rect.right and self.oldRect.left >= sprite.oldRect.right:
                         self.rect.left = sprite.rect.right
                         self.pos.x = self.rect.x
 
             if direction == 'vertical':
                 for sprite in collisionSprites:
                     #collision on the top
-                    if self.rect.bottom >= sprite.rect.top:
+                    if self.rect.bottom >= sprite.rect.top and self.oldRect.bottom <= sprite.oldRect.top:
                         self.rect.bottom = sprite.rect.top
                         self.pos.y = self.rect.y
 
                     #collision on the bottom
-                    if self.rect.top <= sprite.rect.bottom:
+                    if self.rect.top <= sprite.rect.bottom and self.oldRect.top >= sprite.oldRect.bottom:
                         self.rect.top = sprite.rect.bottom
                         self.pos.y = self.rect.y
 
     def update(self):
+        self.oldRect = self.rect.copy()
         self.move()
 
         #update rectangle position
@@ -132,6 +135,8 @@ class Tree(pygame.sprite.Sprite):
         self.rect.center = pygame.math.Vector2(x,y)
         self.pos = pygame.math.Vector2(x,y)
         self.sheet = sheet
+
+        self.oldRect = self.rect.copy()
 
     def draw(self):
         self.sheet.blit(self.image, (self.pos.x-150, self.pos.y-175))
