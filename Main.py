@@ -6,6 +6,7 @@ pygame.init()
 from scripts import * 
 from scripts.classes import *
 
+
 #sets window settings
 size = width, height = 1920, 1080
 screen = pygame.display.set_mode(size)
@@ -24,41 +25,29 @@ treeSprite = pygame.image.load('./images/Tree.png').convert_alpha()
 bgImg = pygame.image.load('./images/background.png').convert_alpha()
 
 #sprites groups
-trees = pygame.sprite.Group()
+collisionSprites = pygame.sprite.Group()
 
 #sprites
-player = Player(width/2,height/2, plrSprite, screen)
 tree1 = Tree(250,250, treeSprite, screen)
-tree1.add(trees)
+tree1.add(collisionSprites)
+
+player = Player(width/2,height/2, plrSprite, screen, collisionSprites)
 
 #game loop
 run = True
 
 while run:
     clock.tick(FPS)
-
     #BACKGROUND
+
     screen.fill(bgclr)
 
     #DRAW SPRITES
     player.draw()
     tree1.draw()
 
-    if pygame.sprite.spritecollide(player, trees, False):
-        #process keys
-        keyPressed = pygame.key.get_pressed()
-        
-        #up or down
-        if keyPressed[pygame.K_w] or keyPressed[pygame.K_s]:
-            print("STOP")
-        
-        #left or right
-        if keyPressed[pygame.K_a] or keyPressed[pygame.K_d]:
-            print("STOP 2")
-
-
     #CONTROLS
-    player.move()
+    player.update()
 
     #for loop through the event queue
     for event in pygame.event.get():        
