@@ -1,4 +1,6 @@
+from typing import Iterable
 import pygame
+from pygame.sprite import AbstractGroup
 
 #classspritesheet
 class SpriteSHeet():
@@ -14,12 +16,10 @@ class SpriteSHeet():
     
 #player class
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, spriteSheet, sheet, obstacles):
+    def __init__(self, x, y, spriteSheet, sheet, obstacles, groups):
         pygame.sprite.Sprite.__init__(self)
+        super().__init__(groups)
         
-        #Size
-        self.height = 130
-        self.width = 85
 
         #Position
         self.pos = pygame.math.Vector2(x, y)
@@ -30,8 +30,8 @@ class Player(pygame.sprite.Sprite):
         #direction
         self.dir = pygame.math.Vector2(0, 0)
 
-        self.image = SpriteSHeet.get_image(spriteSheet, 0, 30, 30)
-        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.image = pygame.transform.scale_by(SpriteSHeet.get_image(spriteSheet, 0, 30, 30), (1,1))
+        self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
         self.rect.center = pygame.math.Vector2(x,y)
 
         self.oldRect = self.rect.copy()
@@ -42,8 +42,7 @@ class Player(pygame.sprite.Sprite):
         self.obstacles = obstacles
 
     def draw(self):
-        self.sheet.blit(pygame.transform.flip(self.image, self.flip, False), (self.rect.x-33, self.rect.y-12))
-        pygame.draw.rect(self.sheet, (255,255,255), self.rect, 2)
+        self.sheet.blit(pygame.transform.flip(self.image, self.flip, False), (self.rect.x, self.rect.y))
 
     def move(self):
         #reset variables
@@ -117,21 +116,50 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = round(self.pos.y)
         self.collision('vertical')
 
-        
+#Camera
+class CameraGroup(pygame.sprite.Group):
+    def __init__(self, bgImg):
+        super().__init__()
+        self.displaySurface = pygame.display.get_surface()
+
+        #camera offset
+        self.offset = pygame.math.Vector2()
+        self.halfW = self.displaySurface.get_size()[0] // 2
+        self.halfH = self.displaySurface.get_size()[1] // 2
+
+        #ground
+        self.groundSurf = pygame.transform.scale_by(bgImg, (5,5))
+        self.groundRect = self.groundSurf.get_rect(topleft = (0,0))
+
+    def centerTargetCam(self, target):
+        self.offset.x = target.rect.centerx - self.halfW
+        self.offset.y = target.rect.centery - self.halfH
+
+    def custom_daw(self, player, sheet):
+        self.centerTargetCam(player)
+
+        #ground
+        groundOffset = self.groundRect.topleft - self.offset
+        self.displaySurface.blit(self.groundSurf,groundOffset)
+
+        #active elements
+        for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
+            offsetPos = sprite.rect.topleft - self.offset
+            self.displaySurface.blit(sprite.image, offsetPos)
+            
+            pygame.draw.rect(sheet, (255,255,255), sprite.rect, 2)
+
 
 #DECORATIONS
 
 #Tree
 class Tree(pygame.sprite.Sprite):
-    def __init__(self, x, y, spriteSheet, sheet):
+    def __init__(self, x, y, spriteSheet, sheet, groups):
         pygame.sprite.Sprite.__init__(self)
+        super().__init__(groups)
 
-        #Size
-        self.height = 150
-        self.width = 125
-
-        self.image = SpriteSHeet.get_image(spriteSheet, 0, 60, 60)
-        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.image = pygame.transform.scale_by(SpriteSHeet.get_image(spriteSheet, 0, 60, 60), (1,1))
+        self.rect = pygame.Rect(0, 0, self.image.get_width(), self.image.get_height())
         self.rect.center = pygame.math.Vector2(x,y)
         self.pos = pygame.math.Vector2(x,y)
         self.sheet = sheet
@@ -139,6 +167,5 @@ class Tree(pygame.sprite.Sprite):
         self.oldRect = self.rect.copy()
 
     def draw(self):
-        self.sheet.blit(self.image, (self.pos.x-150, self.pos.y-175))
-        pygame.draw.rect(self.sheet, (255,255,255), self.rect, 2)
+        self.sheet.blit(self.image, (self.pos.x, self.pos.y))
 

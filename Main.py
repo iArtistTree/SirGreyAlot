@@ -1,6 +1,6 @@
 #imports pygame & time
 from multiprocessing.connection import wait
-import pygame,time
+import pygame,time, random
 pygame.init()
 
 from scripts import * 
@@ -25,13 +25,20 @@ treeSprite = pygame.image.load('./images/Tree.png').convert_alpha()
 bgImg = pygame.image.load('./images/background.png').convert_alpha()
 
 #sprites groups
+allsprites = pygame.sprite.Group()
 collisionSprites = pygame.sprite.Group()
 
-#sprites
-tree1 = Tree(250,250, treeSprite, screen)
-tree1.add(collisionSprites)
+cameraGroup = CameraGroup(bgImg)
 
-player = Player(width/2,height/2, plrSprite, screen, collisionSprites)
+#sprites
+for tree in range(15):
+    x = random.randint(0 ,4000)
+    y = random.randint(0 ,2000)
+
+    Tree(x,y, treeSprite, screen,[collisionSprites, allsprites, cameraGroup])
+
+
+player = Player(width/2,height/2, plrSprite, screen, collisionSprites, [allsprites, cameraGroup])
 
 #game loop
 run = True
@@ -43,11 +50,10 @@ while run:
     screen.fill(bgclr)
 
     #DRAW SPRITES
-    player.draw()
-    tree1.draw()
 
     #CONTROLS
-    player.update()
+    cameraGroup.update()
+    cameraGroup.custom_daw(player, screen)
 
     #for loop through the event queue
     for event in pygame.event.get():        
